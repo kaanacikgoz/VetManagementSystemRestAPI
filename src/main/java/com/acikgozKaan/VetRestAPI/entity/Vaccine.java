@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,5 +32,8 @@ public class Vaccine {
 
     @Column(name = "vaccine_protection_finish_date",nullable = false)
     private LocalDate protectionFinishDate;
+
+    @ManyToMany(mappedBy = "vaccineList")
+    private List<Animal> animalList;
 
 }

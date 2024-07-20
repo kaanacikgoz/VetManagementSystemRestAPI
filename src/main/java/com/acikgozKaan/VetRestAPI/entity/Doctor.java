@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,5 +36,16 @@ public class Doctor {
 
     @Column(name = "doctor_city",nullable = false)
     private String city;
+
+    @ManyToMany
+    @JoinTable(
+            name = "DoctorAvailableDate",
+            joinColumns = {@JoinColumn(name = "doctor_id")},
+            inverseJoinColumns = {@JoinColumn(name = "available_date_id")}
+    )
+    private List<AvailableDate> availableDateList;
+
+    @OneToMany(mappedBy = "doctor")
+    private List<Appointment> appointmentList;
 
 }

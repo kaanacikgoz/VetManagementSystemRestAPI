@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -38,6 +39,22 @@ public class Animal {
 
     @Column(name = "animal_date_of_birth",nullable = false)
     private LocalDate dateOfBirth;
+
+    @ManyToOne()
+    @JoinColumn(name = "customer_id",referencedColumnName = "id")
+    private Customer customer;
+
+    @OneToMany(mappedBy = "animal")
+    private List<Appointment> appointmentList;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "AnimalVaccine",
+            joinColumns = {@JoinColumn(name = "animal_id")},
+            inverseJoinColumns = {@JoinColumn(name = "vaccine_id")}
+    )
+    private List<Vaccine> vaccineList;
 
     @Getter
     public enum Gender {

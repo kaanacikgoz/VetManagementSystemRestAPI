@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,5 +36,11 @@ public class Customer {
 
     @Column(name = "customer_city",nullable = false)
     private String city;
+
+    @OneToMany(mappedBy = "customer")
+    private List<Animal> animalList;
+
+    @OneToMany(mappedBy = "customer")
+    private List<Appointment> appointmentList;
 
 }

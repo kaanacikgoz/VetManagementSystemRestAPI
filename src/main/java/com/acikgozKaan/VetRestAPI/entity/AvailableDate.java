@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,5 +24,8 @@ public class AvailableDate {
     //@Temporal(TemporalType.DATE) No Necessary
     @Column(name = "available_date",nullable = false)
     private LocalDate availableDate;
+
+    @ManyToMany(mappedBy = "availableDateList")
+    private List<Doctor> doctorList;
 
 }

@@ -27,7 +27,19 @@ public class Appointment {
     Instant, LocalDateTime, OffsetDateTime and ZonedDateTime are mapped to TIMESTAMP
      */
     //@Temporal(TemporalType.TIMESTAMP) No Necessary
-    @Column(name = "appointment_date",unique = true,nullable = false)
+    @Column(name = "appointment_date",nullable = false)
     private LocalDateTime appointmentDate;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id",referencedColumnName = "id")
+    private Customer customer;
+
+    @ManyToOne
+    @JoinColumn(name = "animal_id",referencedColumnName = "id")
+    private Animal animal;
+
+    @ManyToOne
+    @JoinColumn(name = "doctor_id",referencedColumnName = "id")
+    private Doctor doctor;
 
 }
