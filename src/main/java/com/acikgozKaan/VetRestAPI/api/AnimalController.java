@@ -9,7 +9,6 @@ import com.acikgozKaan.VetRestAPI.dto.request.animal.AnimalUpdateRequest;
 import com.acikgozKaan.VetRestAPI.dto.response.AnimalResponse;
 import com.acikgozKaan.VetRestAPI.entity.Animal;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +28,7 @@ public class AnimalController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResultData<AnimalResponse> saveCategory(@Valid @RequestBody AnimalSaveRequest animalSaveRequest) {
+    public ResultData<AnimalResponse> save(@Valid @RequestBody AnimalSaveRequest animalSaveRequest) {
         Animal saveAnimal = modelMapper.forRequest().map(animalSaveRequest, Animal.class);
         this.animalService.save(saveAnimal);
 
@@ -45,7 +44,7 @@ public class AnimalController {
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResultData<AnimalResponse> updateCategory(@Valid @RequestBody AnimalUpdateRequest animalUpdateRequest) {
+    public ResultData<AnimalResponse> update(@Valid @RequestBody AnimalUpdateRequest animalUpdateRequest) {
         Animal updateAnimal = modelMapper.forRequest().map(animalUpdateRequest, Animal.class);
         animalService.update(updateAnimal);
 
@@ -55,7 +54,7 @@ public class AnimalController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResultData<Animal> deleteCategory(@PathVariable("id") Long id) {
+    public ResultData<Animal> delete(@PathVariable("id") Long id) {
         Animal deletedAnimal = animalService.getById(id);
         this.animalService.delete(id);
         return ResultHelper.deleted(deletedAnimal);
