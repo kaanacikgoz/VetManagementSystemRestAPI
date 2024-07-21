@@ -1,2 +1,4 @@
-package com.acikgozKaan.VetRestAPI.dto.request.animal;public class AnimalSaveRequest {
+package com.acikgozKaan.VetRestAPI.dto.request.animal;
+
+public class AnimalSaveRequest {
 }
