@@ -16,17 +16,11 @@ public class AnimalResponse {
 
     private Long id;
     private String name;
-
     private String species;
-
     private String breed;
-
     private Animal.Gender gender;
-
     private String colour;
-
     private LocalDate dateOfBirth;
-
     private Long customerId;
 
     //private List<Appointment> appointmentList;
@@ -35,14 +29,8 @@ public class AnimalResponse {
 
     @Getter
     public enum Gender {
-        MALE("M"),
-        FEMALE("F");
-
-        private final String value;
-
-        Gender(String value) {
-            this.value = value;
-        }
+        MALE,
+        FEMALE;
     }
 
 }
