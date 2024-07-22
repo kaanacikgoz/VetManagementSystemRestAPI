@@ -3,6 +3,7 @@ package com.acikgozKaan.VetRestAPI.business.concretes;
 import com.acikgozKaan.VetRestAPI.business.abstracts.ICustomerService;
 import com.acikgozKaan.VetRestAPI.core.exception.NotFoundException;
 import com.acikgozKaan.VetRestAPI.core.utilies.Msg;
+import com.acikgozKaan.VetRestAPI.core.utilies.ResultHelper;
 import com.acikgozKaan.VetRestAPI.dao.CustomerRepo;
 import com.acikgozKaan.VetRestAPI.entity.Customer;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,20 @@ public class CustomerManager implements ICustomerService {
 
     @Override
     public void save(Customer customer) {
-        customerRepo.save(customer);
+        List<Customer> dbCustomer = this.getAll();
+        boolean isExistingMailOrPhone=false;
+        for (Customer newCustomer:dbCustomer) {
+            if (customer.getMail().equals(newCustomer.getMail())
+            || customer.getPhone().equals(newCustomer.getPhone())) {
+                isExistingMailOrPhone = true;
+                break;
+            }
+        }
+        if (isExistingMailOrPhone) {
+            ResultHelper.error("Duplicate Error");
+        } else {
+            customerRepo.save(customer);
+        }
     }
 
     @Override
