@@ -46,7 +46,7 @@ public class AnimalController {
             animalResponse.setCustomerId(savedAnimal.getCustomer().getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(ResultHelper.created(animalResponse));
     } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultHelper.error("Not Found Customer"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultHelper.errorData("Not Found Customer"));
         }
     }
 
