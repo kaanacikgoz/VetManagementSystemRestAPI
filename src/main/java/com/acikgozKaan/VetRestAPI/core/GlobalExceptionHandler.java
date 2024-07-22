@@ -1,5 +1,6 @@
 package com.acikgozKaan.VetRestAPI.core;
 
+import com.acikgozKaan.VetRestAPI.core.exception.DuplicateEntryException;
 import com.acikgozKaan.VetRestAPI.core.exception.NotFoundException;
 import com.acikgozKaan.VetRestAPI.core.result.Result;
 import com.acikgozKaan.VetRestAPI.core.result.ResultData;
@@ -19,6 +20,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Result> handleNotFoundException(NotFoundException e) {
         return new ResponseEntity<>(ResultHelper.notFound(e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DuplicateEntryException.class)
+    public ResponseEntity<Result> handleDuplicateEntryException(DuplicateEntryException e) {
+        return new ResponseEntity<>(ResultHelper.error(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
