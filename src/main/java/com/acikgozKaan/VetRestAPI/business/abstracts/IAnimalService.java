@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface IAnimalService {
 
-    void save(Animal animal);
+    Animal save(Animal animal);
 
     List<Animal> getAll();
 
@@ -15,5 +15,7 @@ public interface IAnimalService {
     Animal update(Animal animal);
 
     void delete(Long id);
+
+    List<Animal> findByName(String name);
 
 }

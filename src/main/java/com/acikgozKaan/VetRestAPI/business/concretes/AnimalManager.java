@@ -19,8 +19,8 @@ public class AnimalManager implements IAnimalService {
     }
 
     @Override
-    public void save(Animal animal) {
-        animalRepo.save(animal);
+    public Animal save(Animal animal) {
+        return animalRepo.save(animal);
     }
 
     @Override
@@ -45,6 +45,11 @@ public class AnimalManager implements IAnimalService {
     public void delete(Long id) {
         Animal animal = this.getById(id);
         animalRepo.delete(animal);
+    }
+
+    @Override
+    public List<Animal> findByName(String name) {
+        return animalRepo.findByName(name);
     }
 
 }
