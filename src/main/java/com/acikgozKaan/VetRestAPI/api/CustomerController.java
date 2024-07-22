@@ -10,6 +10,7 @@ import com.acikgozKaan.VetRestAPI.dto.response.CustomerResponse;
 import com.acikgozKaan.VetRestAPI.entity.Customer;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,6 +46,21 @@ public class CustomerController {
                         customer -> modelMapper.forResponse().map(customer, CustomerResponse.class))
                 .collect(Collectors.toList());
         return ResultHelper.success(customerResponses);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ResultData<List<CustomerResponse>>> findByName(@RequestParam String name) {
+        List<Customer> customers = customerService.findByName(name);
+        List<CustomerResponse> customerResponses = customers.stream()
+                .map(customer -> modelMapper.forResponse().map(customer, CustomerResponse.class))
+                .collect(Collectors.toList());
+        if (customers.isEmpty()) {
+            ResultData<List<CustomerResponse>> result = ResultHelper.notFound(customerResponses);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        } else {
+            ResultData<List<CustomerResponse>> result = ResultHelper.success(customerResponses);
+            return ResponseEntity.ok(result);
+        }
     }
 
     @PutMapping
