@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/customers")
@@ -38,8 +39,12 @@ public class CustomerController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Customer> getAll() {
-        return customerService.getAll();
+    public ResultData<List<CustomerResponse>> getAll() {
+        List<Customer> customers = customerService.getAll();
+        List<CustomerResponse> customerResponses = customers.stream().map(
+                        customer -> modelMapper.forResponse().map(customer, CustomerResponse.class))
+                .collect(Collectors.toList());
+        return ResultHelper.success(customerResponses);
     }
 
     @PutMapping
@@ -54,10 +59,11 @@ public class CustomerController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResultData<Customer> delete(@PathVariable("id") Long id) {
+    public ResultData<CustomerResponse> delete(@PathVariable("id") Long id) {
         Customer deletedCustomer = customerService.getById(id);
         this.customerService.delete(id);
-        return ResultHelper.deleted(deletedCustomer);
+        CustomerResponse customerResponse = modelMapper.forResponse().map(deletedCustomer, CustomerResponse.class);
+        return ResultHelper.deleted(customerResponse);
     }
 
 }
