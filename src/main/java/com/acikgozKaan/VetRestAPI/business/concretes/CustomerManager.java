@@ -1,9 +1,9 @@
 package com.acikgozKaan.VetRestAPI.business.concretes;
 
 import com.acikgozKaan.VetRestAPI.business.abstracts.ICustomerService;
+import com.acikgozKaan.VetRestAPI.core.exception.DuplicateEntryException;
 import com.acikgozKaan.VetRestAPI.core.exception.NotFoundException;
 import com.acikgozKaan.VetRestAPI.core.utilies.Msg;
-import com.acikgozKaan.VetRestAPI.core.utilies.ResultHelper;
 import com.acikgozKaan.VetRestAPI.dao.CustomerRepo;
 import com.acikgozKaan.VetRestAPI.entity.Customer;
 import org.springframework.stereotype.Service;
@@ -20,20 +20,14 @@ public class CustomerManager implements ICustomerService {
     }
 
     @Override
-    public void save(Customer customer) {
-        List<Customer> dbCustomer = this.getAll();
-        boolean isExistingMailOrPhone=false;
-        for (Customer newCustomer:dbCustomer) {
-            if (customer.getMail().equals(newCustomer.getMail())
-            || customer.getPhone().equals(newCustomer.getPhone())) {
-                isExistingMailOrPhone = true;
-                break;
-            }
-        }
-        if (isExistingMailOrPhone) {
-            ResultHelper.error("Duplicate Error");
+    public Customer save(Customer customer) {
+        boolean emailExists = customerRepo.findByMail(customer.getMail()).isPresent();
+        boolean phoneExists = customerRepo.findByPhone(customer.getPhone()).isPresent();
+
+        if (emailExists || phoneExists) {
+            throw new DuplicateEntryException("Duplicate Error: Email or Phone number already exists.");
         } else {
-            customerRepo.save(customer);
+            return customerRepo.save(customer);
         }
     }
 
@@ -59,6 +53,11 @@ public class CustomerManager implements ICustomerService {
     public void delete(Long id) {
         Customer customer = this.getById(id);
         customerRepo.delete(customer);
+    }
+
+    @Override
+    public List<Customer> findByName(String name) {
+        return customerRepo.findByName(name);
     }
 
 }
