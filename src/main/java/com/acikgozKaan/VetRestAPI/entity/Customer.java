@@ -37,10 +37,10 @@ public class Customer {
     @Column(name = "customer_city",nullable = false)
     private String city;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Animal> animalList;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Appointment> appointmentList;
 
 }

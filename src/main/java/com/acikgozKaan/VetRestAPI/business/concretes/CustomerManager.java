@@ -7,6 +7,7 @@ import com.acikgozKaan.VetRestAPI.core.utilies.Msg;
 import com.acikgozKaan.VetRestAPI.dao.CustomerRepo;
 import com.acikgozKaan.VetRestAPI.entity.Customer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -68,6 +69,7 @@ public class CustomerManager implements ICustomerService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         Customer customer = this.getById(id);
         customerRepo.delete(customer);
