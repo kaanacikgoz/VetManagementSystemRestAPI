@@ -18,4 +18,6 @@ public interface IAnimalService {
 
     List<Animal> findByName(String name);
 
+    List<Animal> findByCustomerId(Long customerId);
+
 }

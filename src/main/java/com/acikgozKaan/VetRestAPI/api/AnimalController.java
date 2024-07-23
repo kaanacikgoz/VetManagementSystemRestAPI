@@ -75,6 +75,22 @@ public class AnimalController {
         }
     }
 
+    @GetMapping("/owner/{customerId}")
+    public ResponseEntity<ResultData<List<AnimalResponse>>> findByCustomerId(@PathVariable Long customerId) {
+        List<Animal> animals = animalService.findByCustomerId(customerId);
+        List<AnimalResponse> animalResponses = animals.stream()
+                .map(animal -> modelMapper.forResponse().map(animal, AnimalResponse.class))
+                .collect(Collectors.toList());
+
+        if (animals.isEmpty()) {
+            ResultData<List<AnimalResponse>> result = ResultHelper.notFound(animalResponses);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        } else {
+            ResultData<List<AnimalResponse>> result = ResultHelper.success(animalResponses);
+            return ResponseEntity.ok(result);
+        }
+    }
+
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResultData<AnimalResponse> update(@PathVariable("id") Long id, @Valid @RequestBody AnimalUpdateRequest animalUpdateRequest) {
