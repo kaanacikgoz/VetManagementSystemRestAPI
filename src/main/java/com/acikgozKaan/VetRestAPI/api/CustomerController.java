@@ -63,13 +63,15 @@ public class CustomerController {
         }
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResultData<CustomerResponse> update(@Valid @RequestBody CustomerUpdateRequest customerUpdateRequest) {
+    public ResultData<CustomerResponse> update(@PathVariable("id") Long id, @Valid @RequestBody CustomerUpdateRequest customerUpdateRequest) {
         Customer updateCustomer = modelMapper.forRequest().map(customerUpdateRequest, Customer.class);
-        customerService.update(updateCustomer);
+        updateCustomer.setId(id);
 
-        CustomerResponse customerResponse = modelMapper.forResponse().map(updateCustomer, CustomerResponse.class);
+        Customer updatedCustomer = customerService.update(updateCustomer);
+
+        CustomerResponse customerResponse = modelMapper.forResponse().map(updatedCustomer, CustomerResponse.class);
         return ResultHelper.success(customerResponse);
     }
 
