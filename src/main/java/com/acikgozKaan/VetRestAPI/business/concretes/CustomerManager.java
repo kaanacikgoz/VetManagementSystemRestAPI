@@ -9,6 +9,7 @@ import com.acikgozKaan.VetRestAPI.entity.Customer;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomerManager implements ICustomerService {
@@ -45,8 +46,25 @@ public class CustomerManager implements ICustomerService {
 
     @Override
     public Customer update(Customer customer) {
-        this.getById(customer.getId());
-        return this.customerRepo.save(customer);
+        Customer existingCustomer = this.getById(customer.getId());
+
+        Optional<Customer> existingCustomerByEmail = customerRepo.findByMail(customer.getMail());
+        Optional<Customer> existingCustomerByPhone = customerRepo.findByPhone(customer.getPhone());
+
+        boolean emailExists = existingCustomerByEmail.isPresent() && !existingCustomerByEmail.get().getId().equals(customer.getId());
+        boolean phoneExists = existingCustomerByPhone.isPresent() && !existingCustomerByPhone.get().getId().equals(customer.getId());
+
+        if (emailExists || phoneExists) {
+            throw new DuplicateEntryException("Duplicate Error: Email or Phone number already exists.");
+        }
+
+        existingCustomer.setName(customer.getName());
+        existingCustomer.setPhone(customer.getPhone());
+        existingCustomer.setMail(customer.getMail());
+        existingCustomer.setAddress(customer.getAddress());
+        existingCustomer.setCity(customer.getCity());
+
+        return customerRepo.save(existingCustomer);
     }
 
     @Override
