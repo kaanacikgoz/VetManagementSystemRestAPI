@@ -38,15 +38,19 @@ public class AnimalController {
         try {
             Animal saveAnimal = modelMapper.forRequest().map(animalSaveRequest, Animal.class);
 
-            Customer customer = customerService.getById(animalSaveRequest.getCustomerId());
-            saveAnimal.setCustomer(customer);
+            if (animalSaveRequest.getCustomerId() != null) {
+                Customer customer = customerService.getById(animalSaveRequest.getCustomerId());
+                saveAnimal.setCustomer(customer);
+            } else {
+                saveAnimal.setCustomer(null);
+            }
 
             Animal savedAnimal = animalService.save(saveAnimal);
 
             AnimalResponse animalResponse = modelMapper.forResponse().map(savedAnimal, AnimalResponse.class);
-            animalResponse.setCustomerId(savedAnimal.getCustomer().getId());
+            animalResponse.setCustomerId(savedAnimal.getCustomer() != null ? savedAnimal.getCustomer().getId() : null);
             return ResponseEntity.status(HttpStatus.CREATED).body(ResultHelper.created(animalResponse));
-    } catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultHelper.errorData("Not Found Customer"));
         }
     }
@@ -99,10 +103,9 @@ public class AnimalController {
             Animal updatedAnimal = animalService.update(id, animalUpdateRequest);
 
             AnimalResponse animalResponse = modelMapper.forResponse().map(updatedAnimal, AnimalResponse.class);
-            animalResponse.setCustomerId(updatedAnimal.getCustomer().getId());
+            animalResponse.setCustomerId(updatedAnimal.getCustomer() != null ? updatedAnimal.getCustomer().getId() : null);
 
             return ResponseEntity.ok(ResultHelper.success(animalResponse));
-
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultHelper.notFoundAnimal(e.getMessage()));
         } catch (Exception e) {

@@ -25,7 +25,19 @@ public class AnimalManager implements IAnimalService {
     }
 
     @Override
+    @Transactional
     public Animal save(Animal animal) {
+        if (animal.getCustomer() != null) {
+            Long customerId = animal.getCustomer().getId();
+            if (customerId != null) {
+                Customer customer = customerRepo.findById(customerId).orElseThrow(
+                        () -> new NotFoundException("Customer not found")
+                );
+                animal.setCustomer(customer);
+            } else {
+                animal.setCustomer(null); // Explicitly set customer to null if customerId is null
+            }
+        }
         return animalRepo.save(animal);
     }
 
@@ -44,10 +56,6 @@ public class AnimalManager implements IAnimalService {
     @Override
     @Transactional
     public Animal update(Long id, AnimalUpdateRequest animalUpdateRequest) {
-        Customer customer = customerRepo.findById(animalUpdateRequest.getCustomerId()).orElseThrow(
-                () -> new NotFoundException("Customer not found")
-        );
-
         Animal existingAnimal = animalRepo.findById(id).orElseThrow(
                 () -> new NotFoundException("Animal not found")
         );
@@ -58,7 +66,15 @@ public class AnimalManager implements IAnimalService {
         existingAnimal.setGender(animalUpdateRequest.getGender());
         existingAnimal.setColour(animalUpdateRequest.getColour());
         existingAnimal.setDateOfBirth(animalUpdateRequest.getDateOfBirth());
-        existingAnimal.setCustomer(customer);
+
+        if (animalUpdateRequest.getCustomerId() != null) {
+            Customer customer = customerRepo.findById(animalUpdateRequest.getCustomerId()).orElseThrow(
+                    () -> new NotFoundException("Customer not found")
+            );
+            existingAnimal.setCustomer(customer);
+        } else {
+            existingAnimal.setCustomer(null); // Explicitly set customer to null if customerId is null
+        }
 
         return animalRepo.save(existingAnimal);
     }

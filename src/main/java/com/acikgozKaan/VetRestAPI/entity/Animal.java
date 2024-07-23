@@ -44,7 +44,7 @@ public class Animal {
     @JoinColumn(name = "customer_id",referencedColumnName = "id")
     private Customer customer;
 
-    @OneToMany(mappedBy = "animal",cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "animal")
     private List<Appointment> appointmentList;
 
     @ManyToMany
