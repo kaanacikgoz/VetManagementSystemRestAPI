@@ -13,6 +13,10 @@ public class ResultHelper {
         return new Result(false, message, "400");
     }
 
+    public static <T> ResultData<T> notFoundAnimal(String message) {
+        return new ResultData<>(false, message, "404",null);
+    }
+
     public static <T> ResultData<T> notFound(T data) {
         return new ResultData<>(false,Msg.NOT_FOUND,"404",data);
     }
