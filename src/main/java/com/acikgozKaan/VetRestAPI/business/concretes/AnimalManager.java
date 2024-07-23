@@ -4,8 +4,12 @@ import com.acikgozKaan.VetRestAPI.business.abstracts.IAnimalService;
 import com.acikgozKaan.VetRestAPI.core.exception.NotFoundException;
 import com.acikgozKaan.VetRestAPI.core.utilies.Msg;
 import com.acikgozKaan.VetRestAPI.dao.AnimalRepo;
+import com.acikgozKaan.VetRestAPI.dao.CustomerRepo;
+import com.acikgozKaan.VetRestAPI.dto.request.animal.AnimalUpdateRequest;
 import com.acikgozKaan.VetRestAPI.entity.Animal;
+import com.acikgozKaan.VetRestAPI.entity.Customer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,9 +17,11 @@ import java.util.List;
 public class AnimalManager implements IAnimalService {
 
     private final AnimalRepo animalRepo;
+    private final CustomerRepo customerRepo;
 
-    public AnimalManager(AnimalRepo animalRepo) {
+    public AnimalManager(AnimalRepo animalRepo, CustomerRepo customerRepo) {
         this.animalRepo = animalRepo;
+        this.customerRepo = customerRepo;
     }
 
     @Override
@@ -36,9 +42,25 @@ public class AnimalManager implements IAnimalService {
     }
 
     @Override
-    public Animal update(Animal animal) {
-        this.getById(animal.getId());
-        return this.animalRepo.save(animal);
+    @Transactional
+    public Animal update(Long id, AnimalUpdateRequest animalUpdateRequest) {
+        Customer customer = customerRepo.findById(animalUpdateRequest.getCustomerId()).orElseThrow(
+                () -> new NotFoundException("Customer not found")
+        );
+
+        Animal existingAnimal = animalRepo.findById(id).orElseThrow(
+                () -> new NotFoundException("Animal not found")
+        );
+
+        existingAnimal.setName(animalUpdateRequest.getName());
+        existingAnimal.setSpecies(animalUpdateRequest.getSpecies());
+        existingAnimal.setBreed(animalUpdateRequest.getBreed());
+        existingAnimal.setGender(animalUpdateRequest.getGender());
+        existingAnimal.setColour(animalUpdateRequest.getColour());
+        existingAnimal.setDateOfBirth(animalUpdateRequest.getDateOfBirth());
+        existingAnimal.setCustomer(customer);
+
+        return animalRepo.save(existingAnimal);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.acikgozKaan.VetRestAPI.business.abstracts;
 
+import com.acikgozKaan.VetRestAPI.dto.request.animal.AnimalUpdateRequest;
 import com.acikgozKaan.VetRestAPI.entity.Animal;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public interface IAnimalService {
 
     Animal getById(Long id);
 
-    Animal update(Animal animal);
+    Animal update(Long id, AnimalUpdateRequest animalUpdateRequest);
 
     void delete(Long id);
 

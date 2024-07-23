@@ -2,6 +2,7 @@ package com.acikgozKaan.VetRestAPI.api;
 
 import com.acikgozKaan.VetRestAPI.business.abstracts.IAnimalService;
 import com.acikgozKaan.VetRestAPI.business.abstracts.ICustomerService;
+import com.acikgozKaan.VetRestAPI.core.exception.NotFoundException;
 import com.acikgozKaan.VetRestAPI.core.modelMapper.IModelMapperService;
 import com.acikgozKaan.VetRestAPI.core.result.ResultData;
 import com.acikgozKaan.VetRestAPI.core.utilies.ResultHelper;
@@ -93,16 +94,20 @@ public class AnimalController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResultData<AnimalResponse> update(@PathVariable("id") Long id, @Valid @RequestBody AnimalUpdateRequest animalUpdateRequest) {
+    public ResponseEntity<ResultData<AnimalResponse>> update(@PathVariable("id") Long id, @Valid @RequestBody AnimalUpdateRequest animalUpdateRequest) {
+        try {
+            Animal updatedAnimal = animalService.update(id, animalUpdateRequest);
 
-        Animal updateAnimal = modelMapper.forRequest().map(animalUpdateRequest, Animal.class);
-        updateAnimal.setId(id);
+            AnimalResponse animalResponse = modelMapper.forResponse().map(updatedAnimal, AnimalResponse.class);
+            animalResponse.setCustomerId(updatedAnimal.getCustomer().getId());
 
-        Animal updatedAnimal = animalService.update(updateAnimal);
+            return ResponseEntity.ok(ResultHelper.success(animalResponse));
 
-        AnimalResponse animalResponse = modelMapper.forResponse().map(updatedAnimal, AnimalResponse.class);
-
-        return ResultHelper.success(animalResponse);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultHelper.notFoundAnimal(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResultHelper.errorData(e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")
