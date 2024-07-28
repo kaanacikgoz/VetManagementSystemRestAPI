@@ -1,12 +1,14 @@
 package com.acikgozKaan.VetRestAPI.business.abstracts;
 
+import com.acikgozKaan.VetRestAPI.dto.request.vaccine.VaccineSaveRequest;
 import com.acikgozKaan.VetRestAPI.entity.Vaccine;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface IVaccineService {
 
-    void save(Vaccine vaccine);
+    Vaccine save(Vaccine vaccine);
 
     List<Vaccine> getAll();
 
@@ -15,5 +17,9 @@ public interface IVaccineService {
     Vaccine update(Vaccine vaccine);
 
     void delete(Long id);
+
+    List<Vaccine> findVaccinesByAnimalId(Long animalId);
+
+    public List<Vaccine> findVaccinesByProtectionFinishDateBetween(LocalDate startDate, LocalDate endDate);
 
 }

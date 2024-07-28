@@ -5,6 +5,7 @@ import com.acikgozKaan.VetRestAPI.core.exception.NotFoundException;
 import com.acikgozKaan.VetRestAPI.core.utilies.Msg;
 import com.acikgozKaan.VetRestAPI.dao.AvailableDateRepo;
 import com.acikgozKaan.VetRestAPI.entity.AvailableDate;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +20,8 @@ public class AvailableDateManager implements IAvailableDateService {
     }
 
     @Override
-    public void save(AvailableDate availableDate) {
-        availableDateRepo.save(availableDate);
+    public AvailableDate save(AvailableDate availableDate) {
+        return availableDateRepo.save(availableDate);
     }
 
     @Override
@@ -45,6 +46,18 @@ public class AvailableDateManager implements IAvailableDateService {
     public void delete(Long id) {
         AvailableDate availableDate = this.getById(id);
         availableDateRepo.delete(availableDate);
+    }
+
+    @Override
+    public List<AvailableDate> findByIds(List<Long> ids) {
+        /*
+        List<AvailableDate> availableDates = availableDateRepo.findAllById(ids);
+        if (availableDates.size() != ids.size()) {
+            throw new EntityNotFoundException("One or more Available Dates not found");
+        }
+        return availableDates;
+         */
+        return availableDateRepo.findAllById(ids);
     }
 
 }

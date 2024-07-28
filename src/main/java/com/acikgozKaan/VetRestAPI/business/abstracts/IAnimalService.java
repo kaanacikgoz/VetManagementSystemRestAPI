@@ -21,4 +21,6 @@ public interface IAnimalService {
 
     List<Animal> findByCustomerId(Long customerId);
 
+    List<Animal> findByIds(List<Long> ids);
+
 }

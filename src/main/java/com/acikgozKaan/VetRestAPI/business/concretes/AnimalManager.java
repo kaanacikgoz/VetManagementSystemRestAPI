@@ -95,4 +95,9 @@ public class AnimalManager implements IAnimalService {
         return animalRepo.findByCustomerId(customerId);
     }
 
+    @Override
+    public List<Animal> findByIds(List<Long> ids) {
+        return animalRepo.findAllById(ids);
+    }
+
 }

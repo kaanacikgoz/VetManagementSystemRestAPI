@@ -1,12 +1,13 @@
 package com.acikgozKaan.VetRestAPI.business.abstracts;
 
+import com.acikgozKaan.VetRestAPI.dto.request.availableDate.AvailableDateSaveRequest;
 import com.acikgozKaan.VetRestAPI.entity.AvailableDate;
 
 import java.util.List;
 
 public interface IAvailableDateService {
 
-    void save(AvailableDate availableDate);
+    AvailableDate save(AvailableDate availableDate);
 
     List<AvailableDate> getAll();
 
@@ -15,5 +16,7 @@ public interface IAvailableDateService {
     AvailableDate update(AvailableDate availableDate);
 
     void delete(Long id);
+
+    List<AvailableDate> findByIds(List<Long> ids);
 
 }

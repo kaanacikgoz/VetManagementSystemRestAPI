@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface IDoctorService {
 
-    void save(Doctor doctor);
+    Doctor save(Doctor doctor);
 
     List<Doctor> getAll();
 
@@ -15,5 +15,7 @@ public interface IDoctorService {
     Doctor update(Doctor doctor);
 
     void delete(Long id);
+
+    List<Doctor> findByIds(List<Long> Ids);
 
 }
