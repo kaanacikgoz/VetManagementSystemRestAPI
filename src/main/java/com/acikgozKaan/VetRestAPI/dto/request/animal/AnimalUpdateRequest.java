@@ -34,6 +34,7 @@ public class AnimalUpdateRequest {
     @NotNull(message = "Animal dateOfBirth can not be null or empty")
     private LocalDate dateOfBirth;
 
+    @NotNull(message = "Animal customerId can not be null or empty")
     private Long customerId;
 
 }
