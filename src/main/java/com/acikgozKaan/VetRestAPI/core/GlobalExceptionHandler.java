@@ -1,6 +1,8 @@
 package com.acikgozKaan.VetRestAPI.core;
 
+import com.acikgozKaan.VetRestAPI.core.exception.AppointmentException;
 import com.acikgozKaan.VetRestAPI.core.exception.DuplicateEntryException;
+import com.acikgozKaan.VetRestAPI.core.exception.EnterDataException;
 import com.acikgozKaan.VetRestAPI.core.exception.NotFoundException;
 import com.acikgozKaan.VetRestAPI.core.result.Result;
 import com.acikgozKaan.VetRestAPI.core.result.ResultData;
@@ -25,6 +27,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateEntryException.class)
     public ResponseEntity<Result> handleDuplicateEntryException(DuplicateEntryException e) {
         return new ResponseEntity<>(ResultHelper.error(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AppointmentException.class)
+    public ResponseEntity<ResultData<String>> handleAppointmentException(AppointmentException e) {
+        return new ResponseEntity<>(ResultHelper.errorData(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EnterDataException.class)
+    public ResponseEntity<ResultData<String>> handleEnterDataException(EnterDataException e) {
+        return new ResponseEntity<>(ResultHelper.errorData(e.getMessage()),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
