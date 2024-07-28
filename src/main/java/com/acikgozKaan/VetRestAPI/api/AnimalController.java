@@ -11,10 +11,12 @@ import com.acikgozKaan.VetRestAPI.dto.request.animal.AnimalUpdateRequest;
 import com.acikgozKaan.VetRestAPI.dto.response.AnimalResponse;
 import com.acikgozKaan.VetRestAPI.entity.Animal;
 import com.acikgozKaan.VetRestAPI.entity.Customer;
+import com.acikgozKaan.VetRestAPI.entity.Vaccine;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.function.EntityResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,66 +36,104 @@ public class AnimalController {
     }
 
     @PostMapping
-    public ResponseEntity<ResultData<AnimalResponse>> save(@Valid @RequestBody AnimalSaveRequest animalSaveRequest) {
-        try {
-            Animal saveAnimal = modelMapper.forRequest().map(animalSaveRequest, Animal.class);
+    public ResultData<AnimalResponse> save(@Valid @RequestBody AnimalSaveRequest animalSaveRequest) {
 
-            if (animalSaveRequest.getCustomerId() != null) {
-                Customer customer = customerService.getById(animalSaveRequest.getCustomerId());
-                saveAnimal.setCustomer(customer);
-            } else {
-                saveAnimal.setCustomer(null);
-            }
+        Customer customer = customerService.getById(animalSaveRequest.getCustomerId());
 
-            Animal savedAnimal = animalService.save(saveAnimal);
+        Animal animal = new Animal(
+                animalSaveRequest.getName(),
+                animalSaveRequest.getSpecies(),
+                animalSaveRequest.getBreed(),
+                animalSaveRequest.getGender(),
+                animalSaveRequest.getColour(),
+                animalSaveRequest.getDateOfBirth(),
+                customer
+        );
 
-            AnimalResponse animalResponse = modelMapper.forResponse().map(savedAnimal, AnimalResponse.class);
-            animalResponse.setCustomerId(savedAnimal.getCustomer() != null ? savedAnimal.getCustomer().getId() : null);
-            return ResponseEntity.status(HttpStatus.CREATED).body(ResultHelper.created(animalResponse));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultHelper.errorData("Not Found Customer"));
-        }
+        Animal savedAnimal = animalService.save(animal);
+
+        AnimalResponse animalResponse = new AnimalResponse(
+                savedAnimal.getId(),
+                savedAnimal.getName(),
+                savedAnimal.getSpecies(),
+                savedAnimal.getBreed(),
+                savedAnimal.getGender(),
+                savedAnimal.getColour(),
+                savedAnimal.getDateOfBirth(),
+                savedAnimal.getCustomer().getId()
+        );
+
+        return ResultHelper.created(animalResponse);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResultData<List<AnimalResponse>> getAll() {
         List<Animal> animals = animalService.getAll();
+
         List<AnimalResponse> animalResponses = animals.stream().map(
-                animal -> modelMapper.forResponse().map(animal, AnimalResponse.class))
-                .collect(Collectors.toList());
+                animal -> {
+                    List<Long> vaccineIds = animal.getVaccineList().stream()
+                            .map(Vaccine::getId)
+                            .collect(Collectors.toList());
+
+                    return new AnimalResponse(
+                            animal.getId(),
+                            animal.getName(),
+                            animal.getSpecies(),
+                            animal.getBreed(),
+                            animal.getGender(),
+                            animal.getColour(),
+                            animal.getDateOfBirth(),
+                            animal.getCustomer().getId(),
+                            vaccineIds
+                    );
+                }).collect(Collectors.toList());
+
         return ResultHelper.success(animalResponses);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ResultData<List<AnimalResponse>>> findByName(@RequestParam String name) {
+    public ResultData<List<AnimalResponse>> findByName(@RequestParam String name) {
         List<Animal> animals = animalService.findByName(name);
-        List<AnimalResponse> animalResponses = animals.stream()
-                .map(animal -> modelMapper.forResponse().map(animal, AnimalResponse.class))
-                .collect(Collectors.toList());
-        if (animals.isEmpty()) {
-            ResultData<List<AnimalResponse>> result = ResultHelper.notFound(animalResponses);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
-        } else {
-            ResultData<List<AnimalResponse>> result = ResultHelper.success(animalResponses);
-            return ResponseEntity.ok(result);
-        }
+
+                List<AnimalResponse> animalResponses = animals.stream()
+                .map(animal -> new AnimalResponse(
+                        animal.getId(),
+                        animal.getName(),
+                        animal.getSpecies(),
+                        animal.getBreed(),
+                        animal.getGender(),
+                        animal.getColour(),
+                        animal.getDateOfBirth(),
+                        animal.getCustomer().getId(),
+                        animal.getVaccineList().stream().map(
+                                Vaccine::getId
+                        ).collect(Collectors.toList())
+                )).collect(Collectors.toList());
+
+        return ResultHelper.success(animalResponses);
     }
 
     @GetMapping("/owner/{customerId}")
-    public ResponseEntity<ResultData<List<AnimalResponse>>> findByCustomerId(@PathVariable Long customerId) {
+    public ResultData<List<AnimalResponse>> findByCustomerId(@PathVariable Long customerId) {
         List<Animal> animals = animalService.findByCustomerId(customerId);
         List<AnimalResponse> animalResponses = animals.stream()
-                .map(animal -> modelMapper.forResponse().map(animal, AnimalResponse.class))
-                .collect(Collectors.toList());
+                .map(animal -> new AnimalResponse(
+                        animal.getId(),
+                        animal.getName(),
+                        animal.getSpecies(),
+                        animal.getBreed(),
+                        animal.getGender(),
+                        animal.getColour(),
+                        animal.getDateOfBirth(),
+                        animal.getCustomer().getId(),
+                        animal.getVaccineList().stream().map(
+                                Vaccine::getId
+                        ).collect(Collectors.toList()))
+                ).collect(Collectors.toList());
 
-        if (animals.isEmpty()) {
-            ResultData<List<AnimalResponse>> result = ResultHelper.notFound(animalResponses);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
-        } else {
-            ResultData<List<AnimalResponse>> result = ResultHelper.success(animalResponses);
-            return ResponseEntity.ok(result);
-        }
+        return ResultHelper.success(animalResponses);
     }
 
     @PutMapping("/{id}")
@@ -103,7 +143,6 @@ public class AnimalController {
             Animal updatedAnimal = animalService.update(id, animalUpdateRequest);
 
             AnimalResponse animalResponse = modelMapper.forResponse().map(updatedAnimal, AnimalResponse.class);
-            animalResponse.setCustomerId(updatedAnimal.getCustomer() != null ? updatedAnimal.getCustomer().getId() : null);
 
             return ResponseEntity.ok(ResultHelper.success(animalResponse));
         } catch (NotFoundException e) {
@@ -118,7 +157,21 @@ public class AnimalController {
     public ResultData<AnimalResponse> delete(@PathVariable("id") Long id) {
         Animal deletedAnimal = animalService.getById(id);
         this.animalService.delete(id);
-        AnimalResponse animalResponse = modelMapper.forResponse().map(deletedAnimal, AnimalResponse.class);
+
+        AnimalResponse animalResponse = new AnimalResponse(
+                deletedAnimal.getId(),
+                deletedAnimal.getName(),
+                deletedAnimal.getSpecies(),
+                deletedAnimal.getBreed(),
+                deletedAnimal.getGender(),
+                deletedAnimal.getColour(),
+                deletedAnimal.getDateOfBirth(),
+                deletedAnimal.getCustomer().getId(),
+                deletedAnimal.getVaccineList().stream().map(
+                        Vaccine::getId
+                ).collect(Collectors.toList())
+        );
+
         return ResultHelper.deleted(animalResponse);
     }
 
