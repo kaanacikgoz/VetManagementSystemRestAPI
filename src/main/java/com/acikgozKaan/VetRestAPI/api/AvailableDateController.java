@@ -2,6 +2,7 @@ package com.acikgozKaan.VetRestAPI.api;
 
 import com.acikgozKaan.VetRestAPI.business.abstracts.IAvailableDateService;
 import com.acikgozKaan.VetRestAPI.business.abstracts.IDoctorService;
+import com.acikgozKaan.VetRestAPI.core.exception.NotFoundException;
 import com.acikgozKaan.VetRestAPI.core.modelMapper.IModelMapperService;
 import com.acikgozKaan.VetRestAPI.core.result.ResultData;
 import com.acikgozKaan.VetRestAPI.core.utilies.ResultHelper;
@@ -23,12 +24,10 @@ public class AvailableDateController {
 
     private final IAvailableDateService availableDateService;
     private final IDoctorService doctorService;
-    private final IModelMapperService modelMapper;
 
     public AvailableDateController(IAvailableDateService availableDateService, IDoctorService doctorService, IModelMapperService modelMapper) {
         this.availableDateService = availableDateService;
         this.doctorService = doctorService;
-        this.modelMapper = modelMapper;
     }
 
 
@@ -42,6 +41,10 @@ public class AvailableDateController {
                 availableDateSaveRequest.getAvailableDate(),
                 doctors
         );
+
+        if (doctors.isEmpty()) {
+            throw new NotFoundException("Doctor not found!");
+        }
 
         AvailableDate savedAvailableDate = availableDateService.save(availableDate);
 
