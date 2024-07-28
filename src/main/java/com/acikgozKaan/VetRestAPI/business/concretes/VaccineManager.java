@@ -25,6 +25,7 @@ public class VaccineManager implements IVaccineService {
         this.animalRepo = animalRepo;
     }
 
+    //Evaluation Form 22
     @Override
     public Vaccine save(Vaccine vaccine) {
         Long animalId = vaccine.getAnimalList().get(0).getId(); // Assuming there's at least one animal
@@ -49,6 +50,7 @@ public class VaccineManager implements IVaccineService {
         );
     }
 
+    //Evaluation Form 22
     @Override
     public Vaccine update(Vaccine vaccine) {
         // Ensure the vaccine exists

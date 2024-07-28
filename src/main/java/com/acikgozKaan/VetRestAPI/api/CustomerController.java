@@ -28,6 +28,7 @@ public class CustomerController {
         this.modelMapper = modelMapper;
     }
 
+    //Evaluation Form 10
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResultData<CustomerResponse> save(@Valid @RequestBody CustomerSaveRequest customerSaveRequest) {
@@ -48,6 +49,7 @@ public class CustomerController {
         return ResultHelper.success(customerResponses);
     }
 
+    //Evaluation Form 11
     @GetMapping("/search")
     public ResponseEntity<ResultData<List<CustomerResponse>>> findByName(@RequestParam String name) {
         List<Customer> customers = customerService.findByName(name);

@@ -30,14 +30,13 @@ public class VaccineController {
 
     private final IVaccineService vaccineService;
     private final IAnimalService animalService;
-    private final IModelMapperService modelMapper;
 
-    public VaccineController(IVaccineService vaccineService, IAnimalService animalService, IModelMapperService modelMapper) {
+    public VaccineController(IVaccineService vaccineService, IAnimalService animalService) {
         this.vaccineService = vaccineService;
         this.animalService = animalService;
-        this.modelMapper = modelMapper;
     }
 
+    //Evaluation Form 21
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResultData<VaccineResponse> save(@Valid @RequestBody VaccineSaveRequest vaccineSaveRequest) {
@@ -95,6 +94,7 @@ public class VaccineController {
         return ResultHelper.success(vaccineResponses);
     }
 
+    //Evaluation Form 24
     @GetMapping("/by-animal/{animalId}")
     @ResponseStatus(HttpStatus.OK)
     public ResultData<List<VaccineResponse>> getVaccinesByAnimalId(@PathVariable("animalId") Long animalId) {
@@ -114,6 +114,7 @@ public class VaccineController {
         return ResultHelper.success(vaccineResponses);
     }
 
+    //Evaluation Form 23
     @GetMapping("/protection-finish-dates")
     public ResultData<List<VaccineResponse>> getVaccinesByProtectionFinishDateBetween(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,

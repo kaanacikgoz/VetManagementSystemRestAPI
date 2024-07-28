@@ -35,6 +35,7 @@ public class AnimalController {
         this.modelMapper = modelMapper;
     }
 
+    //Evaluation Form 12
     @PostMapping
     public ResultData<AnimalResponse> save(@Valid @RequestBody AnimalSaveRequest animalSaveRequest) {
 
@@ -93,6 +94,7 @@ public class AnimalController {
         return ResultHelper.success(animalResponses);
     }
 
+    //Evaluation Form 13
     @GetMapping("/search")
     public ResultData<List<AnimalResponse>> findByName(@RequestParam String name) {
         List<Animal> animals = animalService.findByName(name);
@@ -115,6 +117,7 @@ public class AnimalController {
         return ResultHelper.success(animalResponses);
     }
 
+    //Evaluation Form 14
     @GetMapping("/owner/{customerId}")
     public ResultData<List<AnimalResponse>> findByCustomerId(@PathVariable Long customerId) {
         List<Animal> animals = animalService.findByCustomerId(customerId);

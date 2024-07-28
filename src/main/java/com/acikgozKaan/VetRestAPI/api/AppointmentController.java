@@ -37,6 +37,8 @@ public class AppointmentController {
         this.animalService = animalService;
     }
 
+    //Evaluation Form 17
+    //Evaluation Form 18
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResultData<AppointmentResponse> save(@RequestBody AppointmentSaveRequest appointmentSaveRequest) {
@@ -111,6 +113,7 @@ public class AppointmentController {
         return ResultHelper.success(appointmentResponses);
     }
 
+    //Evaluation Form 20
     @GetMapping("/filter/doctor-id")
     public ResultData<List<AppointmentResponse>> filterAppointmentsByDoctorId(
             @RequestParam Long doctorId,
@@ -133,6 +136,7 @@ public class AppointmentController {
         return ResultHelper.success(appointmentResponses);
     }
 
+    //Evaluation Form 19
     @GetMapping("/filter/animal-id")
     public ResultData<List<AppointmentResponse>> filterAppointmentsByAnimalId(
             @RequestParam("animalId") Long animalId,

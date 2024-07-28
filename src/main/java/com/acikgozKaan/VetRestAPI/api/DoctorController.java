@@ -27,19 +27,17 @@ public class DoctorController {
 
     private final IDoctorService doctorService;
     private final IAvailableDateService availableDateService;
-    private final IAppointmentService appointmentService;
 
-    public DoctorController(IDoctorService doctorService, IAvailableDateService availableDateService, IAppointmentService appointmentService) {
+    public DoctorController(IDoctorService doctorService, IAvailableDateService availableDateService) {
         this.doctorService = doctorService;
         this.availableDateService = availableDateService;
-        this.appointmentService = appointmentService;
     }
 
+    //Evaluation Form 15
     @PostMapping
     public ResultData<DoctorResponse> save(@Valid @RequestBody DoctorSaveRequest doctorSaveRequest) {
 
         List<AvailableDate> availableDates = availableDateService.findByIds(doctorSaveRequest.getAvailableDateIds());
-        //List<Appointment> appointments = appointmentService.findByIds(doctorSaveRequest.getAppointmentIds());
 
         if (availableDates.isEmpty()) {
             return ResultHelper.errorData("Not found availableDate!");
