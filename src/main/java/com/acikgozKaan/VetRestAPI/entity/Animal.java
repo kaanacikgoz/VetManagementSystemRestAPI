@@ -44,15 +44,10 @@ public class Animal {
     @JoinColumn(name = "customer_id",referencedColumnName = "id")
     private Customer customer;
 
-    @OneToMany(mappedBy = "animal")
+    @OneToMany(mappedBy = "animal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Appointment> appointmentList;
 
-    @ManyToMany
-    @JoinTable(
-            name = "AnimalVaccine",
-            joinColumns = {@JoinColumn(name = "animal_id")},
-            inverseJoinColumns = {@JoinColumn(name = "vaccine_id")}
-    )
+    @ManyToMany(mappedBy = "animalList",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Vaccine> vaccineList;
 
     @Getter
@@ -61,4 +56,13 @@ public class Animal {
         FEMALE
     }
 
+    public Animal(String name, String species, String breed, Gender gender, String colour, LocalDate dateOfBirth, Customer customer) {
+        this.name = name;
+        this.species = species;
+        this.breed = breed;
+        this.gender = gender;
+        this.colour = colour;
+        this.dateOfBirth = dateOfBirth;
+        this.customer = customer;
+    }
 }

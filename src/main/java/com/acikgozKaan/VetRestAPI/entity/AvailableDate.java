@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -25,7 +26,17 @@ public class AvailableDate {
     @Column(name = "available_date",nullable = false)
     private LocalDate availableDate;
 
-    @ManyToMany(mappedBy = "availableDateList")
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @JoinTable(
+            name = "doctor_available_date",
+            joinColumns = @JoinColumn(name = "available_date_id"),
+            inverseJoinColumns = @JoinColumn(name = "doctor_id")
+    )
     private List<Doctor> doctorList;
+
+    public AvailableDate(LocalDate availableDate, List<Doctor> doctorList) {
+        this.availableDate = availableDate;
+        this.doctorList = doctorList;
+    }
 
 }

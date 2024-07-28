@@ -30,16 +30,23 @@ public class Appointment {
     @Column(name = "appointment_date",nullable = false)
     private LocalDateTime appointmentDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id",referencedColumnName = "id")
     private Customer customer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "animal_id",referencedColumnName = "id")
     private Animal animal;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id",referencedColumnName = "id")
     private Doctor doctor;
+
+    public Appointment(LocalDateTime appointmentDate, Customer customer, Animal animal, Doctor doctor) {
+        this.appointmentDate = appointmentDate;
+        this.customer = customer;
+        this.animal = animal;
+        this.doctor = doctor;
+    }
 
 }

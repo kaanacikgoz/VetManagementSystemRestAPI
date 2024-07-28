@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -37,15 +38,19 @@ public class Doctor {
     @Column(name = "doctor_city",nullable = false)
     private String city;
 
-    @ManyToMany
-    @JoinTable(
-            name = "DoctorAvailableDate",
-            joinColumns = {@JoinColumn(name = "doctor_id")},
-            inverseJoinColumns = {@JoinColumn(name = "available_date_id")}
-    )
+    @ManyToMany(mappedBy = "doctorList", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private List<AvailableDate> availableDateList;
 
-    @OneToMany(mappedBy = "doctor")
+    @OneToMany(mappedBy = "doctor",fetch = FetchType.EAGER,cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Appointment> appointmentList;
+
+    public Doctor(String name, String phone, String mail, String address, String city, List<AvailableDate> availableDateList) {
+        this.name = name;
+        this.phone = phone;
+        this.mail = mail;
+        this.address = address;
+        this.city = city;
+        this.availableDateList = availableDateList;
+    }
 
 }
