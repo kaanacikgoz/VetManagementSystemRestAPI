@@ -137,7 +137,7 @@ public class AnimalManagerTest {
     }
 
     @Test
-    void getAll_Animal_Success() {
+    void getAll_Animals_Success() {
         // given
         Animal animal = Animal.builder()
                 .name("Animal")
@@ -382,7 +382,7 @@ public class AnimalManagerTest {
     }
 
     @Test
-    void findByIds_Animal_Success3() {
+    void findByIds_Animals_Success() {
         // given
         Animal animal = Animal.builder()
                 .id(1L)
