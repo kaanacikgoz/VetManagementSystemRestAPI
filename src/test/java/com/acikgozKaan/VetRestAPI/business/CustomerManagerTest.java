@@ -30,7 +30,7 @@ public class CustomerManagerTest {
     private CustomerRepo customerRepo;
 
     @Nested
-    class saveTest {
+    final class saveTest {
 
         @Test
         void save_CustomerIfNotDuplicate_Success() {
@@ -108,9 +108,8 @@ public class CustomerManagerTest {
         }
     }
 
-
     @Test
-    void getAll_Customer_Success() {
+    void getAll_Customers_Success() {
         // given
         Customer customer = Customer.builder()
                 .id(1L)
@@ -135,7 +134,7 @@ public class CustomerManagerTest {
     }
 
     @Nested
-    public class getByIdTest {
+    final class getByIdTest {
 
         @Test
         void getById_Customer_Success() {
@@ -170,6 +169,7 @@ public class CustomerManagerTest {
             Exception thrown = assertThrows(NotFoundException.class, ()->customerManager.getById(customer.getId()));
 
             // then
+            verify(customerRepo).findById(customer.getId());
             verify(customerRepo, never()).save(customer);
             assertThat(thrown).isNotNull();
             assertThat(thrown).extracting(Exception::getMessage)
@@ -177,6 +177,200 @@ public class CustomerManagerTest {
         }
     }
 
+    @Nested
+    final class updateTest {
 
+        @Test
+        void update_Customer_Success() {
+            // given
+            Customer customer = Customer.builder()
+                    .id(1L)
+                    .name("Customer")
+                    .mail("customer@mail.com")
+                    .phone("123123123")
+                    .build();
+
+            when(customerRepo.findById(customer.getId())).thenReturn(Optional.of(customer));
+            when(customerRepo.save(customer)).thenReturn(customer);
+
+            // when
+            when(customerRepo.findByMail("updatedCustomer@mail.com")).thenReturn(Optional.empty());
+            when(customerRepo.findByPhone("321321321")).thenReturn(Optional.empty());
+
+            customer.setName("UpdatedCustomer");
+            customer.setMail("updatedCustomer@mail.com");
+            customer.setPhone("321321321");
+
+            Customer updatedCustomer = customerManager.update(customer);
+
+            // then
+            assertThat(updatedCustomer).isNotNull();
+            assertThat(updatedCustomer.getName()).isEqualTo("UpdatedCustomer");
+            assertThat(updatedCustomer.getMail()).isEqualTo("updatedCustomer@mail.com");
+            assertThat(updatedCustomer.getPhone()).isEqualTo("321321321");
+
+            verify(customerRepo).findById(customer.getId());
+            verify(customerRepo).findByMail(customer.getMail());
+            verify(customerRepo).findByPhone(customer.getPhone());
+            verify(customerRepo).save(customer);
+        }
+
+        @Test
+        void update_CustomerWithDuplicateMail_ThrowsDuplicateEntryException() {
+            // given
+            Customer customer = Customer.builder()
+                    .id(1L)
+                    .name("Customer")
+                    .mail("customer@mail.com")
+                    .phone("123123123")
+                    .build();
+
+            Customer customer2 = Customer.builder()
+                    .id(2L)
+                    .name("Customer2")
+                    .mail("customer2@mail.com")
+                    .phone("321321321")
+                    .build();
+
+            when(customerRepo.findById(customer.getId())).thenReturn(Optional.of(customer));
+
+            // when
+            when(customerRepo.findByMail("customer2@mail.com")).thenReturn(Optional.of(customer2));
+            when(customerRepo.findByPhone("111111111")).thenReturn(Optional.empty());
+
+            customer.setName("UpdatedCustomer");
+            customer.setMail("customer2@mail.com");
+            customer.setPhone("111111111");
+
+            Exception thrown = assertThrows(DuplicateEntryException.class, ()->customerManager.update(customer));
+
+            // then
+            assertThat(thrown).isInstanceOf(DuplicateEntryException.class);
+            assertThat(thrown.getMessage()).isEqualTo("Duplicate Error: Email or Phone number already exists.");
+            verify(customerRepo, never()).save(customer);
+        }
+
+        @Test
+        void update_CustomerWithDuplicatePhone_ThrowsDuplicateEntryException() {
+            // given
+            Customer customer = Customer.builder()
+                    .id(1L)
+                    .name("Customer")
+                    .mail("customer@mail.com")
+                    .phone("123123123")
+                    .build();
+
+            Customer customer2 = Customer.builder()
+                    .id(2L)
+                    .name("Customer2")
+                    .mail("customer2@mail.com")
+                    .phone("123123123")
+                    .build();
+
+            when(customerRepo.findById(customer.getId())).thenReturn(Optional.of(customer));
+
+            // when
+            customer.setName("UpdatedCustomer");
+            customer.setMail("customer3@mail.com");
+            customer.setPhone("123123123");
+
+            when(customerRepo.findByMail("customer3@mail.com")).thenReturn(Optional.empty());
+            when(customerRepo.findByPhone("123123123")).thenReturn(Optional.of(customer2));
+
+            Exception thrown = assertThrows(DuplicateEntryException.class, ()->customerManager.update(customer));
+
+            // then
+            assertThat(thrown).isInstanceOf(DuplicateEntryException.class);
+            assertThat(thrown.getMessage()).isEqualTo("Duplicate Error: Email or Phone number already exists.");
+            verify(customerRepo, never()).save(customer);
+        }
+
+    }
+
+    @Nested
+    final class deleteTest {
+
+        @Test
+        void delete_ExistingCustomer_Success() {
+            // given
+            Customer customer = Customer.builder()
+                    .id(1L)
+                    .name("Customer")
+                    .build();
+
+            when(customerRepo.findById(customer.getId())).thenReturn(Optional.of(customer));
+
+            // when
+            customerManager.delete(customer.getId());
+
+            // then
+            verify(customerRepo).findById(customer.getId());
+            verify(customerRepo).delete(customer);
+        }
+
+        @Test
+        void delete_NonExistingCustomer_ThrowsNotFoundException() {
+            // given
+            Long nonExistingCustomerId = 1L;
+
+            when(customerRepo.findById(nonExistingCustomerId)).thenReturn(Optional.empty());
+
+            // when
+            Exception thrown = assertThrows(NotFoundException.class, ()->customerManager.delete(nonExistingCustomerId));
+
+            // then
+            verify(customerRepo, never()).delete(any(Customer.class));
+            assertThat(thrown).extracting(Exception::getMessage)
+                    .isEqualTo(Msg.NOT_FOUND);
+        }
+    }
+
+    @Nested
+    final class findByNameTest {
+
+        @Test
+        void findByName_Customer_Success() {
+            // given
+            Customer customer = Customer.builder()
+                    .id(1L)
+                    .name("Customer")
+                    .build();
+
+            when(customerRepo.findByName(customer.getName())).thenReturn(List.of(customer));
+
+            // when
+            List<Customer> foundCustomers = customerManager.findByName(customer.getName());
+
+            // then
+            assertThat(foundCustomers).hasSize(1);
+            assertThat(foundCustomers).extracting(Customer::getName)
+                    .containsExactlyInAnyOrder("Customer");
+        }
+
+        @Test
+        void findByName_Customers_Success() {
+            // given
+            Customer customer = Customer.builder()
+                    .id(1L)
+                    .name("Customer")
+                    .build();
+
+            Customer customer2 = Customer.builder()
+                    .id(2L)
+                    .name("Customer")
+                    .build();
+
+            when(customerRepo.findByName(customer.getName())).thenReturn(List.of(customer,customer2));
+
+            // when
+            List<Customer> foundCustomers = customerManager.findByName(customer.getName());
+
+            // then
+            verify(customerRepo).findByName(customer.getName());
+            assertThat(foundCustomers).hasSize(2);
+            assertThat(foundCustomers).extracting(Customer::getId)
+                    .containsExactlyInAnyOrder(1L,2L);
+        }
+    }
 
 }
