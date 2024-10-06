@@ -6,7 +6,6 @@ import com.acikgozKaan.VetRestAPI.core.exception.NotFoundException;
 import com.acikgozKaan.VetRestAPI.core.utilies.Msg;
 import com.acikgozKaan.VetRestAPI.dao.AnimalRepo;
 import com.acikgozKaan.VetRestAPI.dao.VaccineRepo;
-import com.acikgozKaan.VetRestAPI.dto.request.vaccine.VaccineSaveRequest;
 import com.acikgozKaan.VetRestAPI.entity.Animal;
 import com.acikgozKaan.VetRestAPI.entity.Vaccine;
 import org.springframework.stereotype.Service;
