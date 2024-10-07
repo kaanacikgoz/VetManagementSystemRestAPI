@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -174,10 +175,30 @@ public class VaccineManagerTest {
         @Test
         void update_Vaccine_Success() {
             // given
+            Animal animal = Animal.builder()
+                    .id(1L)
+                    .name("Animal")
+                    .build();
+
+            Vaccine vaccine = Vaccine.builder()
+                    .id(1L)
+                    .name("Vaccine")
+                    .code("XXX")
+                    .animalList(List.of(animal))
+                    .build();
+
+            when(vaccineRepo.findById(vaccine.getId())).thenReturn(Optional.of(vaccine));
+            when(animalRepo.existsById(vaccine.getAnimalList().get(0).getId())).thenReturn(true);
+            when(vaccineRepo.findActiveVaccinesByAnimalIdAndCode(vaccine.getAnimalList().get(0).getId(), vaccine.getCode(), LocalDate.now())).thenReturn(new ArrayList<>());
+            when(vaccineRepo.save(vaccine)).thenReturn(vaccine);
 
             // when
+            vaccine.setName("UpdatedVaccine");
+            Vaccine updatedVaccine = vaccineManager.update(vaccine);
 
             // then
+            verify(vaccineRepo).save(vaccine);
+            assertThat(updatedVaccine.getName()).isEqualTo("UpdatedVaccine");
         }
 
         @Test
