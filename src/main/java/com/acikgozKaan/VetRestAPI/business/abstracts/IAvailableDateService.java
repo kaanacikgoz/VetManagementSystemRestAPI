@@ -1,6 +1,5 @@
 package com.acikgozKaan.VetRestAPI.business.abstracts;
 
-import com.acikgozKaan.VetRestAPI.dto.request.availableDate.AvailableDateSaveRequest;
 import com.acikgozKaan.VetRestAPI.entity.AvailableDate;
 
 import java.util.List;
