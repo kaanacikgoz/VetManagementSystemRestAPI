@@ -204,25 +204,76 @@ public class VaccineManagerTest {
         @Test
         void update_Vaccine_ThrowsNotFoundException() {
             // given
+            Animal animal = Animal.builder()
+                    .id(1L)
+                    .name("Animal")
+                    .build();
+
+            Long nonExistingAnimalId = 2L;
+
+            Vaccine existingVaccine = Vaccine.builder()
+                    .id(1L)
+                    .name("Vaccine")
+                    .animalList(List.of(animal))
+                    .build();
+
+            when(vaccineRepo.findById(existingVaccine.getId())).thenReturn(Optional.of(existingVaccine));
+            when(animalRepo.existsById(nonExistingAnimalId)).thenReturn(false);
 
             // when
+            existingVaccine.setAnimalList(List.of(Animal.builder().
+                    id(nonExistingAnimalId).build()));
+            Exception thrown = assertThrows(NotFoundException.class, ()->vaccineManager.update(existingVaccine));
 
             // then
+            verify(vaccineRepo, never()).save(any(Vaccine.class));
+            assertThat(thrown.getMessage()).isEqualTo("Animal with ID " + nonExistingAnimalId + " not found.");
         }
 
         @Test
         void update_Vaccine_ThrowsDuplicateEntryException() {
             // given
+            Animal animal = Animal.builder()
+                    .id(1L)
+                    .name("Animal")
+                    .build();
+
+            Animal animal2 = Animal.builder()
+                    .id(2L)
+                    .name("Animal2")
+                    .build();
+
+            Vaccine existingVaccine = Vaccine.builder()
+                    .id(1L)
+                    .name("Vaccine")
+                    .code("XXX")
+                    .protectionStartDate(LocalDate.of(2024,5,23))
+                    .protectionFinishDate(LocalDate.of(2024,8,23))
+                    .animalList(List.of(animal))
+                    .build();
+
+            Vaccine existingVaccine2 = Vaccine.builder()
+                    .id(2L)
+                    .name("Vaccine2")
+                    .code("XXX")
+                    .protectionStartDate(LocalDate.of(2024,6,23))
+                    .protectionFinishDate(LocalDate.of(2024,7,23))
+                    .animalList(List.of(animal2))
+                    .build();
+
+            when(vaccineRepo.findById(existingVaccine.getId())).thenReturn(Optional.of(existingVaccine));
+            when(animalRepo.existsById(animal2.getId())).thenReturn(true);
+
+            existingVaccine.setAnimalList(List.of(animal2));
+            when(vaccineRepo.findActiveVaccinesByAnimalIdAndCode(existingVaccine.getAnimalList().get(0).getId(), existingVaccine.getCode(), LocalDate.now())).thenReturn(new ArrayList<>(List.of(existingVaccine2)));
 
             // when
+            Exception thrown = assertThrows(DuplicateEntryException.class, ()->vaccineManager.update(existingVaccine));
 
             // then
+            verify(vaccineRepo, never()).save(existingVaccine);
+            assertThat(thrown.getMessage()).isEqualTo("Animal with ID " + animal2.getId() + " already has an active vaccine of the same type.");
         }
-
-    }
-
-    @Test
-    void update_Vaccine_Success() {
 
     }
 
