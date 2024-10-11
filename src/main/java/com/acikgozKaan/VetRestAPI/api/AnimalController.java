@@ -37,6 +37,7 @@ public class AnimalController {
 
     //Evaluation Form 12
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ResultData<AnimalResponse> save(@Valid @RequestBody AnimalSaveRequest animalSaveRequest) {
 
         Customer customer = customerService.getById(animalSaveRequest.getCustomerId());
@@ -96,6 +97,7 @@ public class AnimalController {
 
     //Evaluation Form 13
     @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
     public ResultData<List<AnimalResponse>> findByName(@RequestParam String name) {
         List<Animal> animals = animalService.findByName(name);
 
@@ -119,6 +121,7 @@ public class AnimalController {
 
     //Evaluation Form 14
     @GetMapping("/owner/{customerId}")
+    @ResponseStatus(HttpStatus.OK)
     public ResultData<List<AnimalResponse>> findByCustomerId(@PathVariable Long customerId) {
         List<Animal> animals = animalService.findByCustomerId(customerId);
         List<AnimalResponse> animalResponses = animals.stream()
@@ -140,7 +143,6 @@ public class AnimalController {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ResultData<AnimalResponse>> update(@PathVariable("id") Long id, @Valid @RequestBody AnimalUpdateRequest animalUpdateRequest) {
         try {
             Animal updatedAnimal = animalService.update(id, animalUpdateRequest);
