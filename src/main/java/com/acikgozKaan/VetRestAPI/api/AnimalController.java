@@ -3,7 +3,6 @@ package com.acikgozKaan.VetRestAPI.api;
 import com.acikgozKaan.VetRestAPI.business.abstracts.IAnimalService;
 import com.acikgozKaan.VetRestAPI.business.abstracts.ICustomerService;
 import com.acikgozKaan.VetRestAPI.core.exception.NotFoundException;
-import com.acikgozKaan.VetRestAPI.core.modelMapper.IModelMapperService;
 import com.acikgozKaan.VetRestAPI.core.result.ResultData;
 import com.acikgozKaan.VetRestAPI.core.utilies.ResultHelper;
 import com.acikgozKaan.VetRestAPI.dto.request.animal.AnimalSaveRequest;
@@ -16,7 +15,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.function.EntityResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,12 +25,10 @@ public class AnimalController {
 
     private final IAnimalService animalService;
     private final ICustomerService customerService;
-    private final IModelMapperService modelMapper;
 
-    public AnimalController(IAnimalService animalService, ICustomerService customerService, IModelMapperService modelMapper) {
+    public AnimalController(IAnimalService animalService, ICustomerService customerService) {
         this.animalService = animalService;
         this.customerService = customerService;
-        this.modelMapper = modelMapper;
     }
 
     //Evaluation Form 12
@@ -147,7 +143,16 @@ public class AnimalController {
         try {
             Animal updatedAnimal = animalService.update(id, animalUpdateRequest);
 
-            AnimalResponse animalResponse = modelMapper.forResponse().map(updatedAnimal, AnimalResponse.class);
+            AnimalResponse animalResponse = new AnimalResponse(
+                    updatedAnimal.getId(),
+                    updatedAnimal.getName(),
+                    updatedAnimal.getSpecies(),
+                    updatedAnimal.getBreed(),
+                    updatedAnimal.getGender(),
+                    updatedAnimal.getColour(),
+                    updatedAnimal.getDateOfBirth(),
+                    updatedAnimal.getCustomer().getId()
+            );
 
             return ResponseEntity.ok(ResultHelper.success(animalResponse));
         } catch (NotFoundException e) {
