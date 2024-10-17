@@ -41,4 +41,8 @@ public class ResultHelper {
         return new ResultData<>(false, message, "400",null);
     }
 
+    public static <T> ResultData<T> internalServerError(String message) {
+        return new ResultData<>(false, message, "500",null);
+    }
+
 }

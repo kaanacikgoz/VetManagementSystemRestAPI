@@ -158,7 +158,7 @@ public class AnimalController {
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultHelper.notFoundAnimal(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResultHelper.errorData(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResultHelper.internalServerError(e.getMessage()));
         }
     }
 
