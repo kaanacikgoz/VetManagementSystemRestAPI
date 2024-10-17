@@ -2,11 +2,11 @@ package com.acikgozKaan.VetRestAPI.api;
 
 import com.acikgozKaan.VetRestAPI.business.abstracts.IAnimalService;
 import com.acikgozKaan.VetRestAPI.business.abstracts.ICustomerService;
+import com.acikgozKaan.VetRestAPI.core.exception.NotFoundException;
 import com.acikgozKaan.VetRestAPI.core.modelMapper.IModelMapperService;
 import com.acikgozKaan.VetRestAPI.core.utilies.Msg;
 import com.acikgozKaan.VetRestAPI.dto.request.animal.AnimalSaveRequest;
 import com.acikgozKaan.VetRestAPI.dto.request.animal.AnimalUpdateRequest;
-import com.acikgozKaan.VetRestAPI.dto.response.AnimalResponse;
 import com.acikgozKaan.VetRestAPI.entity.Animal;
 import com.acikgozKaan.VetRestAPI.entity.Customer;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,15 +17,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
@@ -233,71 +230,149 @@ public class AnimalControllerTest {
                 );
     }
 
-/*
-    @Test
-    void update_Animal_Success() throws Exception {
-        // given
-        Customer customer = Customer.builder()
-                .id(1L)
-                .build();
+    @Nested
+    final class updateTests {
 
-        AnimalUpdateRequest updateRequest = AnimalUpdateRequest.builder()
-                .name("UpdatedAnimal")
-                .species("Dog")
-                .breed("Golden")
-                .gender(Animal.Gender.MALE)
-                .colour("Yellow")
-                .dateOfBirth(LocalDate.of(2024,1,30))
-                .customerId(1L)
-                .build();
+        @Test
+        void update_Animal_Success() throws Exception {
+            // given
+            Customer customer = Customer.builder()
+                    .id(1L)
+                    .build();
 
-        Animal updatedAnimal = Animal.builder()
-                .id(1L)
-                .name("UpdatedAnimal")
-                .species("Dog")
-                .breed("Golden")
-                .gender(Animal.Gender.MALE)
-                .colour("Yellow")
-                .dateOfBirth(LocalDate.of(2024,1,30))
-                .customer(customer)
-                .vaccineList(List.of())
-                .build();
+            AnimalUpdateRequest updateRequest = AnimalUpdateRequest.builder()
+                    .name("UpdatedAnimal")
+                    .species("Dog")
+                    .breed("Golden")
+                    .gender(Animal.Gender.MALE)
+                    .colour("Yellow")
+                    .dateOfBirth(LocalDate.of(2024,1,30))
+                    .customerId(1L)
+                    .build();
 
-        AnimalResponse animalResponse = new AnimalResponse(
-                1L,
-                "UpdatedAnimal",
-                "Dog",
-                "Golden",
-                Animal.Gender.MALE,
-                "Yellow",
-                LocalDate.of(2024,1,30),
-                1L
-        );
+            Animal updatedAnimal = Animal.builder()
+                    .id(1L)
+                    .name("UpdatedAnimal")
+                    .species("Dog")
+                    .breed("Golden")
+                    .gender(Animal.Gender.MALE)
+                    .colour("Yellow")
+                    .dateOfBirth(LocalDate.of(2024,1,30))
+                    .customer(customer)
+                    .vaccineList(List.of())
+                    .build();
+            /*
+            AnimalResponse animalResponse = new AnimalResponse(
+                    updatedAnimal.getId(),
+                    updatedAnimal.getName(),
+                    updatedAnimal.getSpecies(),
+                    updatedAnimal.getBreed(),
+                    updatedAnimal.getGender(),
+                    updatedAnimal.getColour(),
+                    updatedAnimal.getDateOfBirth(),
+                    updatedAnimal.getCustomer().getId()
+            );
+            */
 
-        // when
-        when(animalService.update(1L, updateRequest)).thenReturn(updatedAnimal);
+            // when
+            /*
+            ModelMapper modelMapperMock = Mockito.mock(ModelMapper.class);
 
-        // then
+            when(modelMapper.forRequest()).thenReturn(modelMapperMock);
+            when(modelMapper.forResponse()).thenReturn(modelMapperMock);
 
-        mockMvc.perform(put("/v1/animals/{id}",1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateRequest))
-                )
-                .andExpectAll(
-                        status().isOk(),
-                        jsonPath("$.status").value(true),
-                        jsonPath("$.message").value(Msg.OK),
-                        jsonPath("$.data.id").value(1L),
-                        jsonPath("$.data.name").value("UpdatedAnimal"),
-                        jsonPath("$.data.species").value("Dog"),
-                        jsonPath("$.data.breed").value("Golden"),
-                        jsonPath("$.data.gender").value("MALE"),
-                        jsonPath("$.data.colour").value("Yellow"),
-                        jsonPath("$.data.dateOfBirth").value("2024-01-30"),
-                        jsonPath("$.data.customerId").value(1L)
-                );
+             */
+
+            //when(modelMapperMock.map(any(AnimalUpdateRequest.class), eq(Animal.class))).thenReturn(updatedAnimal);
+            when(animalService.update(eq(1L), any(AnimalUpdateRequest.class))).thenReturn(updatedAnimal);
+            //when(modelMapperMock.map(eq(updatedAnimal), eq(AnimalResponse.class))).thenReturn(animalResponse);
+
+            // then
+
+            mockMvc.perform(put("/v1/animals/{id}",1L)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(updateRequest))
+                    )
+                    .andExpectAll(
+                            status().isOk(),
+                            jsonPath("$.status").value(true),
+                            jsonPath("$.message").value(Msg.OK),
+                            jsonPath("$.data.id").value(1L),
+                            jsonPath("$.data.name").value("UpdatedAnimal"),
+                            jsonPath("$.data.species").value("Dog"),
+                            jsonPath("$.data.breed").value("Golden"),
+                            jsonPath("$.data.gender").value("MALE"),
+                            jsonPath("$.data.colour").value("Yellow"),
+                            jsonPath("$.data.dateOfBirth").value("2024-01-30"),
+                            jsonPath("$.data.customerId").value(1L)
+                    );
+        }
+
+        @Test
+        void update_Animal_NotFoundError() throws Exception {
+            // given
+            Long nonExistingAnimalId = 25L;
+
+            AnimalUpdateRequest animalUpdateRequest = AnimalUpdateRequest.builder()
+                    .name("UpdatedAnimal")
+                    .species("Dog")
+                    .breed("Golden")
+                    .gender(Animal.Gender.FEMALE)
+                    .colour("Yellow")
+                    .dateOfBirth(LocalDate.of(2022, 10, 15))
+                    .customerId(1L)
+                    .build();
+
+            // when
+            when(animalService.update(anyLong(), any(AnimalUpdateRequest.class)))
+                    .thenThrow(new NotFoundException("Animal not found"));
+
+            // then
+            mockMvc.perform(put("/v1/animals/{id}", nonExistingAnimalId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(animalUpdateRequest)))
+                    .andExpectAll(
+                            status().isNotFound(),
+                            jsonPath("$.status").value(false),
+                            jsonPath("$.message").value("Animal not found"),
+                            jsonPath("$.code").value(404),
+                            jsonPath("$.data").isEmpty()
+                    );
+        }
+
+        @Test
+        void update_Animal_InternalServerError() throws Exception {
+            // given
+            Long nonExistingAnimalId = 1L;
+
+            AnimalUpdateRequest animalUpdateRequest = AnimalUpdateRequest.builder()
+                    .name("UpdatedAnimal")
+                    .species("Dog")
+                    .breed("Golden")
+                    .gender(Animal.Gender.FEMALE)
+                    .colour("Yellow")
+                    .dateOfBirth(LocalDate.of(2022, 10, 15))
+                    .customerId(1L)
+                    .build();
+
+            // when
+            when(animalService.update(anyLong(), any(AnimalUpdateRequest.class)))
+                    .thenThrow(new RuntimeException("Unexpected error"));
+
+            // then
+            mockMvc.perform(put("/v1/animals/{id}", nonExistingAnimalId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(animalUpdateRequest)))
+                    .andExpectAll(
+                            status().isInternalServerError(),
+                            jsonPath("$.status").value(false),
+                            jsonPath("$.message").value("Unexpected error"),
+                            jsonPath("$.code").value(500),
+                            jsonPath("$.data").isEmpty()
+                    );
+        }
+
     }
- */
 
     @Test
     void delete_Animal_Success() throws Exception {
