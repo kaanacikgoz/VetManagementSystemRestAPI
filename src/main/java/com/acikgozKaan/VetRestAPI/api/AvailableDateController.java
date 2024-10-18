@@ -3,7 +3,6 @@ package com.acikgozKaan.VetRestAPI.api;
 import com.acikgozKaan.VetRestAPI.business.abstracts.IAvailableDateService;
 import com.acikgozKaan.VetRestAPI.business.abstracts.IDoctorService;
 import com.acikgozKaan.VetRestAPI.core.exception.NotFoundException;
-import com.acikgozKaan.VetRestAPI.core.modelMapper.IModelMapperService;
 import com.acikgozKaan.VetRestAPI.core.result.ResultData;
 import com.acikgozKaan.VetRestAPI.core.utilies.ResultHelper;
 import com.acikgozKaan.VetRestAPI.dto.request.availableDate.AvailableDateSaveRequest;
@@ -25,7 +24,7 @@ public class AvailableDateController {
     private final IAvailableDateService availableDateService;
     private final IDoctorService doctorService;
 
-    public AvailableDateController(IAvailableDateService availableDateService, IDoctorService doctorService, IModelMapperService modelMapper) {
+    public AvailableDateController(IAvailableDateService availableDateService, IDoctorService doctorService) {
         this.availableDateService = availableDateService;
         this.doctorService = doctorService;
     }
@@ -63,7 +62,8 @@ public class AvailableDateController {
     }
 
     @GetMapping
-    private ResultData<List<AvailableDateResponse>> getAll() {
+    @ResponseStatus(HttpStatus.OK)
+    public ResultData<List<AvailableDateResponse>> getAll() {
         List<AvailableDate> availableDates = availableDateService.getAll();
 
         List<AvailableDateResponse> availableDateResponses = availableDates.stream().map(
@@ -83,22 +83,17 @@ public class AvailableDateController {
         AvailableDate existingAvailableDate = availableDateService.getById(id);
 
         if (existingAvailableDate == null) {
-            return ResultHelper.errorData("Available Date not found.");
+            throw new NotFoundException("Available Date not found.");
         }
 
-        // Update the availableDate field
         existingAvailableDate.setAvailableDate(availableDateUpdateRequest.getAvailableDate());
 
-        // Retrieve the new list of doctors
         List<Doctor> newDoctors = doctorService.findByIds(availableDateUpdateRequest.getDoctorIds());
 
-        // Update the doctors in the available date
         existingAvailableDate.setDoctorList(newDoctors);
 
-        // Save the updated available date
         AvailableDate updatedAvailableDate = availableDateService.save(existingAvailableDate);
 
-        // Prepare the response
         List<Long> doctorIds = updatedAvailableDate.getDoctorList().stream().map(
                 Doctor::getId
         ).collect(Collectors.toList());
