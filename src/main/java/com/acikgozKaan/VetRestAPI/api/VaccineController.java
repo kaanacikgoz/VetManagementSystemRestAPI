@@ -57,7 +57,7 @@ public class VaccineController {
         Vaccine savedVaccine = vaccineService.save(vaccine);
 
         VaccineResponse vaccineResponse = new VaccineResponse(
-                vaccine.getId(),
+                savedVaccine.getId(),
                 vaccine.getName(),
                 vaccine.getCode(),
                 vaccine.getProtectionStartDate(),

@@ -1,9 +1,7 @@
 package com.acikgozKaan.VetRestAPI.dto.request.vaccine;
 
-import com.acikgozKaan.VetRestAPI.entity.Animal;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,10 +16,10 @@ import java.util.List;
 @AllArgsConstructor
 public class VaccineSaveRequest {
 
-    @NotBlank(message = "Customer name cannot be null or empty")
+    @NotBlank(message = "Vaccine name cannot be null or empty")
     private String name;
 
-    @NotBlank(message = "Customer name cannot be null or empty")
+    @NotBlank(message = "Vaccine name cannot be null or empty")
     private String code;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
