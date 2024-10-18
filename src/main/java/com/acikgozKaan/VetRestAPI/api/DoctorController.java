@@ -1,16 +1,13 @@
 package com.acikgozKaan.VetRestAPI.api;
 
-import com.acikgozKaan.VetRestAPI.business.abstracts.IAppointmentService;
 import com.acikgozKaan.VetRestAPI.business.abstracts.IAvailableDateService;
 import com.acikgozKaan.VetRestAPI.business.abstracts.IDoctorService;
-import com.acikgozKaan.VetRestAPI.core.modelMapper.IModelMapperService;
+import com.acikgozKaan.VetRestAPI.core.exception.NotFoundException;
 import com.acikgozKaan.VetRestAPI.core.result.ResultData;
 import com.acikgozKaan.VetRestAPI.core.utilies.ResultHelper;
 import com.acikgozKaan.VetRestAPI.dto.request.doctor.DoctorSaveRequest;
 import com.acikgozKaan.VetRestAPI.dto.request.doctor.DoctorUpdateRequest;
-import com.acikgozKaan.VetRestAPI.dto.response.AnimalResponse;
 import com.acikgozKaan.VetRestAPI.dto.response.DoctorResponse;
-import com.acikgozKaan.VetRestAPI.entity.Animal;
 import com.acikgozKaan.VetRestAPI.entity.Appointment;
 import com.acikgozKaan.VetRestAPI.entity.AvailableDate;
 import com.acikgozKaan.VetRestAPI.entity.Doctor;
@@ -35,12 +32,13 @@ public class DoctorController {
 
     //Evaluation Form 15
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ResultData<DoctorResponse> save(@Valid @RequestBody DoctorSaveRequest doctorSaveRequest) {
 
         List<AvailableDate> availableDates = availableDateService.findByIds(doctorSaveRequest.getAvailableDateIds());
 
         if (availableDates.isEmpty()) {
-            return ResultHelper.errorData("Not found availableDate!");
+            throw new NotFoundException("Not found availableDate!");
         }
 
         Doctor doctor = new Doctor(
@@ -55,12 +53,10 @@ public class DoctorController {
 
         Doctor savedDoctor = doctorService.save(doctor);
 
-
         for (AvailableDate availableDate : availableDates) {
             availableDate.getDoctorList().add(savedDoctor);
             availableDateService.save(availableDate); // Save the updated availableDate to persist the relationship
         }
-
 
         DoctorResponse doctorResponse = new DoctorResponse(
                 savedDoctor.getId(),
@@ -83,7 +79,7 @@ public class DoctorController {
     }
 
     @GetMapping
-    private ResultData<List<DoctorResponse>> getAll() {
+    public ResultData<List<DoctorResponse>> getAll() {
         List<Doctor> doctors = doctorService.getAll();
 
         List<DoctorResponse> doctorResponses = doctors.stream().map(
@@ -114,34 +110,28 @@ public class DoctorController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResultData<DoctorResponse> update(@PathVariable("id") Long id, @Valid @RequestBody DoctorUpdateRequest doctorUpdateRequest) {
-        // Retrieve the existing Doctor entity
         Doctor existingDoctor = doctorService.getById(id);
 
         if (existingDoctor == null) {
-            return ResultHelper.errorData("Doctor not found.");
+            throw new NotFoundException("Doctor not found.");
         }
 
-        // Update the doctor's basic fields
         existingDoctor.setName(doctorUpdateRequest.getName());
         existingDoctor.setPhone(doctorUpdateRequest.getPhone());
         existingDoctor.setMail(doctorUpdateRequest.getMail());
         existingDoctor.setAddress(doctorUpdateRequest.getAddress());
         existingDoctor.setCity(doctorUpdateRequest.getCity());
 
-        // Update the list of AvailableDates
         List<AvailableDate> updatedAvailableDates = availableDateService.findByIds(doctorUpdateRequest.getAvailableDateIds());
         existingDoctor.setAvailableDateList(updatedAvailableDates);
-
 
         // Handle appointment updates if necessary
         // (Assuming you have a method to find appointments by ids if needed)
         // List<Appointment> updatedAppointments = appointmentService.findByIds(doctorUpdateRequest.getAppointmentIds());
         // existingDoctor.setAppointmentList(updatedAppointments);
 
-        // Save the updated doctor
         Doctor updatedDoctor = doctorService.save(existingDoctor);
 
-        // Prepare the response
         DoctorResponse doctorResponse = new DoctorResponse(
                 updatedDoctor.getId(),
                 updatedDoctor.getName(),
@@ -169,7 +159,7 @@ public class DoctorController {
 
         for (AvailableDate availableDate : availableDates) {
             availableDate.getDoctorList().remove(deletedDoctor);
-            availableDateService.save(availableDate); // Update the available date
+            availableDateService.save(availableDate);
         }
 
         this.doctorService.delete(id);
@@ -191,6 +181,5 @@ public class DoctorController {
 
         return ResultHelper.deleted(doctorResponse);
     }
-
 
 }
