@@ -134,9 +134,7 @@ public class CustomerControllerTest {
         when(customerService.getAll()).thenReturn(List.of(customer, customer2));
 
         // then
-        mockMvc.perform(get("/v1/customers")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
+        mockMvc.perform(get("/v1/customers"))
                 .andExpectAll(
                         jsonPath("$.status").value(true),
                         jsonPath("$.message").value(Msg.OK),
@@ -173,8 +171,7 @@ public class CustomerControllerTest {
 
             // then
             mockMvc.perform(get("/v1/customers/search")
-                            .param("name", "Customer")
-                            .contentType(MediaType.APPLICATION_JSON))
+                            .param("name", "Customer"))
                     .andExpectAll(
                             status().isOk(),
                             jsonPath("$.status").value(true),
@@ -218,8 +215,7 @@ public class CustomerControllerTest {
 
             // then
             mockMvc.perform(get("/v1/customers/search")
-                            .param("name", "Customer")
-                            .contentType(MediaType.APPLICATION_JSON))
+                            .param("name", "Customer"))
                     .andExpectAll(
                             status().isOk(),
                             jsonPath("$.status").value(true),
@@ -242,8 +238,7 @@ public class CustomerControllerTest {
 
             // then
             mockMvc.perform(get("/v1/customers/search")
-                    .param("name", nonExistingCustomerName)
-                    .contentType(MediaType.APPLICATION_JSON))
+                    .param("name", nonExistingCustomerName))
                     .andExpectAll(
                             status().isNotFound(),
                             jsonPath("$.status").value(false),
@@ -359,9 +354,7 @@ public class CustomerControllerTest {
             when(modelMapperMock.map(willDeleteCustomer, CustomerResponse.class)).thenReturn(customerResponse);
 
             // then
-            mockMvc.perform(delete("/v1/customers/{id}", willDeleteCustomer.getId())
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andDo(print())
+            mockMvc.perform(delete("/v1/customers/{id}", willDeleteCustomer.getId()))
                     .andExpectAll(
                             status().isOk(),
                             jsonPath("$.status").value(true),
@@ -385,8 +378,7 @@ public class CustomerControllerTest {
             when(customerService.getById(nonExistingCustomerId)).thenThrow(new NotFoundException(Msg.NOT_FOUND));
 
             // then
-            mockMvc.perform(delete("/v1/customers/{id}", nonExistingCustomerId)
-                            .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(delete("/v1/customers/{id}", nonExistingCustomerId))
                     .andDo(print())
                     .andExpectAll(
                             status().isNotFound(),

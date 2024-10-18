@@ -113,8 +113,7 @@ public class AnimalControllerTest {
         when(animalService.getAll()).thenReturn(List.of(animal, animal2));
 
         // then
-        mockMvc.perform(get("/v1/animals")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/v1/animals"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(true))
                 .andExpect(jsonPath("$.message").value(Msg.OK))
@@ -153,7 +152,6 @@ public class AnimalControllerTest {
             // then
             mockMvc.perform(get("/v1/animals/search?")
                             .param("name", searchName)
-                            .contentType(MediaType.APPLICATION_JSON)
                     )
                     .andExpect(status().isOk())
                     .andExpectAll(
@@ -217,8 +215,7 @@ public class AnimalControllerTest {
         when(animalService.findByCustomerId(1L)).thenReturn(List.of(animal));
 
         // then
-        mockMvc.perform(get("/v1/animals/owner/{customerId}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/v1/animals/owner/{customerId}", 1L))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.status").value(true),
@@ -398,9 +395,7 @@ public class AnimalControllerTest {
         doNothing().when(animalService).delete(3L);
 
         // then
-        mockMvc.perform(delete("/v1/animals/{id}", 3L)
-                        .contentType(MediaType.APPLICATION_JSON))
-                //.andDo(print())
+        mockMvc.perform(delete("/v1/animals/{id}", 3L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(true))
                 .andExpect(jsonPath("$.message").value(Msg.DELETED))
